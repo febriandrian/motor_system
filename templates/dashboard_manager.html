@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Manager - Laporan Rekap Motor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Sistem Pendataan Motor</a>
+        <div class="d-flex text-white">
+            <span class="me-3">Halo, {{ current_user.username }} (Manager)</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+    <!-- Statistik Ringkas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Motor</h5>
+                    <h3>{{ total_motor }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Sekolah Terbanyak</h5>
+                    {% if sekolah_terbanyak %}
+                        <h6>{{ sekolah_terbanyak[0] }}</h6>
+                        <p>{{ sekolah_terbanyak[1] }} unit</p>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Model Terpopuler</h5>
+                    {% if model_terpopuler %}
+                        <h6>{{ model_terpopuler[0] }}</h6>
+                        <p>{{ model_terpopuler[1] }} unit</p>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Daerah Terbanyak</h5>
+                    {% if daerah_terbanyak %}
+                        <h6>{{ daerah_terbanyak[0] }}</h6>
+                        <p>{{ daerah_terbanyak[1] }} unit</p>
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grafik Bar -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">Grafik Jumlah Motor per Model</div>
+        <div class="card-body">
+            <canvas id="motorBarChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabel Rekap -->
+    <div class="card">
+        <div class="card-header bg-dark text-white">Laporan Rekap Motor per Sekolah</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Sekolah</th>
+                        <th>Kabupaten/Kota</th>
+                        <th>Merek</th>
+                        <th>Model</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in entries %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ e.nama_sekolah }}</td>
+                        <td>{{ e.kabupaten }}</td>
+                        <td>{{ e.merek }}</td>
+                        <td>{{ e.model }}</td>
+                        <td>{{ e.total }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Belum ada data motor</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('motorBarChart').getContext('2d');
+    const motorBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_data | map(attribute=0) | list | tojson }},
+            datasets: [{
+                label: 'Jumlah Motor',
+                data: {{ chart_data | map(attribute=1) | list | tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

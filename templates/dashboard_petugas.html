@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Petugas - Sistem Pendataan Motor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Sistem Pendataan Motor</a>
+        <div class="d-flex text-white">
+            <span class="me-3">Halo, {{ current_user.username }} (Petugas)</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <h3 class="mb-4">Input Data Motor</h3>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-info">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <!-- Pilih Sekolah -->
+        <div class="mb-4">
+            <label class="form-label">Pilih Sekolah</label>
+            <select name="school_id" class="form-select" required>
+                <option value="">-- Pilih Sekolah --</option>
+                {% for s in schools %}
+                    <option value="{{ s.id }}">
+                        {{ s.name }} - {{ s.tanggal_input.strftime('%d/%m/%Y') }} ({{ s.kabupaten }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Input Jumlah Motor per Model -->
+        {% set current_brand = "" %}
+        {% for m in motors %}
+            {% if m.brand != current_brand %}
+                {% if not loop.first %}</div>{% endif %}
+                <h5 class="mt-4">{{ m.brand }}</h5>
+                <div class="row">
+                {% set current_brand = m.brand %}
+            {% endif %}
+            <div class="col-md-4 mb-3">
+                <label class="form-label">{{ m.model }}</label>
+                <input type="number" min="0" name="model_{{ m.id }}" class="form-control" value="0">
+            </div>
+            {% if loop.last %}</div>{% endif %}
+        {% endfor %}
+
+        <button class="btn btn-primary mt-3" type="submit">Simpan Data</button>
+    </form>
+</div>
+
+</body>
+</html>
