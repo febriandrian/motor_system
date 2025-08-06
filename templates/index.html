@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Motor</title>
+</head>
+<body>
+    <h1>Data Motor</h1>
+    <form action="/add" method="post">
+        Merek: <input type="text" name="merek"><br>
+        Model: <input type="text" name="model"><br>
+        Sekolah: <input type="text" name="sekolah"><br>
+        <button type="submit">Tambah</button>
+    </form>
+    <table border="1" cellpadding="5">
+        <tr><th>Merek</th><th>Model</th><th>Sekolah</th></tr>
+        {% for m in motors %}
+            <tr>
+                <td>{{ m.merek }}</td>
+                <td>{{ m.model }}</td>
+                <td>{{ m.sekolah }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
